@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ContentResponse.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">major_project</a> &gt; <a href="index.source.html" class="el_package">major_project.Model.HTTP.Input.content_search</a> &gt; <span class="el_source">ContentResponse.java</span></div><h1>ContentResponse.java</h1><pre class="source lang-java linenums">package major_project.Model.HTTP.Input.content_search;
+
+import java.util.List;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
+public class ContentResponse {
+
+@SerializedName(&quot;status&quot;)
+@Expose
+private String status;
+@SerializedName(&quot;userTier&quot;)
+@Expose
+private String userTier;
+@SerializedName(&quot;total&quot;)
+@Expose
+private Integer total;
+@SerializedName(&quot;startIndex&quot;)
+@Expose
+private Integer startIndex;
+@SerializedName(&quot;pageSize&quot;)
+@Expose
+private Integer pageSize;
+@SerializedName(&quot;currentPage&quot;)
+@Expose
+private Integer currentPage;
+@SerializedName(&quot;pages&quot;)
+@Expose
+private Integer pages;
+@SerializedName(&quot;orderBy&quot;)
+@Expose
+private String orderBy;
+<span class="nc" id="L33">@SerializedName(&quot;results&quot;)</span>
+@Expose
+private List&lt;Content&gt; results = null;
+
+/**
+* No args constructor for use in serialization
+*
+*/
+<span class="nc" id="L41">public ContentResponse() {</span>
+<span class="nc" id="L42">}</span>
+
+/**
+*
+* @param userTier
+* @param total
+* @param startIndex
+* @param pages
+* @param pageSize
+* @param orderBy
+* @param currentPage
+* @param results
+* @param status
+*/
+public ContentResponse(String status, String userTier, Integer total, Integer startIndex, Integer pageSize, Integer currentPage, Integer pages, String orderBy, List&lt;Content&gt; results) {
+<span class="nc" id="L57">super();</span>
+<span class="nc" id="L58">this.status = status;</span>
+<span class="nc" id="L59">this.userTier = userTier;</span>
+<span class="nc" id="L60">this.total = total;</span>
+<span class="nc" id="L61">this.startIndex = startIndex;</span>
+<span class="nc" id="L62">this.pageSize = pageSize;</span>
+<span class="nc" id="L63">this.currentPage = currentPage;</span>
+<span class="nc" id="L64">this.pages = pages;</span>
+<span class="nc" id="L65">this.orderBy = orderBy;</span>
+<span class="nc" id="L66">this.results = results;</span>
+<span class="nc" id="L67">}</span>
+
+
+/** 
+ * @return String
+ */
+public String getStatus() {
+<span class="nc" id="L74">return status;</span>
+}
+
+
+/** 
+ * @param status
+ */
+public void setStatus(String status) {
+<span class="nc" id="L82">this.status = status;</span>
+<span class="nc" id="L83">}</span>
+
+
+/** 
+ * @return String
+ */
+public String getUserTier() {
+<span class="nc" id="L90">return userTier;</span>
+}
+
+
+/** 
+ * @param userTier
+ */
+public void setUserTier(String userTier) {
+<span class="nc" id="L98">this.userTier = userTier;</span>
+<span class="nc" id="L99">}</span>
+
+
+/** 
+ * @return Integer
+ */
+public Integer getTotal() {
+<span class="nc" id="L106">return total;</span>
+}
+
+
+/** 
+ * @param total
+ */
+public void setTotal(Integer total) {
+<span class="nc" id="L114">this.total = total;</span>
+<span class="nc" id="L115">}</span>
+
+
+/** 
+ * @return Integer
+ */
+public Integer getStartIndex() {
+<span class="nc" id="L122">return startIndex;</span>
+}
+
+
+/** 
+ * @param startIndex
+ */
+public void setStartIndex(Integer startIndex) {
+<span class="nc" id="L130">this.startIndex = startIndex;</span>
+<span class="nc" id="L131">}</span>
+
+
+/** 
+ * @return Integer
+ */
+public Integer getPageSize() {
+<span class="nc" id="L138">return pageSize;</span>
+}
+
+
+/** 
+ * @param pageSize
+ */
+public void setPageSize(Integer pageSize) {
+<span class="nc" id="L146">this.pageSize = pageSize;</span>
+<span class="nc" id="L147">}</span>
+
+
+/** 
+ * @return Integer
+ */
+public Integer getCurrentPage() {
+<span class="nc" id="L154">return currentPage;</span>
+}
+
+
+/** 
+ * @param currentPage
+ */
+public void setCurrentPage(Integer currentPage) {
+<span class="nc" id="L162">this.currentPage = currentPage;</span>
+<span class="nc" id="L163">}</span>
+
+
+/** 
+ * @return Integer
+ */
+public Integer getPages() {
+<span class="nc" id="L170">return pages;</span>
+}
+
+
+/** 
+ * @param pages
+ */
+public void setPages(Integer pages) {
+<span class="nc" id="L178">this.pages = pages;</span>
+<span class="nc" id="L179">}</span>
+
+
+/** 
+ * @return String
+ */
+public String getOrderBy() {
+<span class="nc" id="L186">return orderBy;</span>
+}
+
+
+/** 
+ * @param orderBy
+ */
+public void setOrderBy(String orderBy) {
+<span class="nc" id="L194">this.orderBy = orderBy;</span>
+<span class="nc" id="L195">}</span>
+
+
+/** 
+ * @return List&lt;Content&gt;
+ */
+public List&lt;Content&gt; getResults() {
+<span class="nc" id="L202">return results;</span>
+}
+
+
+/** 
+ * @param results
+ */
+public void setResults(List&lt;Content&gt; results) {
+<span class="nc" id="L210">this.results = results;</span>
+<span class="nc" id="L211">}</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

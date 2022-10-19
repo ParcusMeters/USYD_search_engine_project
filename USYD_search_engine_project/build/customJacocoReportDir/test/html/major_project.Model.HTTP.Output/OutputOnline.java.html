@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OutputOnline.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">major_project</a> &gt; <a href="index.source.html" class="el_package">major_project.Model.HTTP.Output</a> &gt; <span class="el_source">OutputOnline.java</span></div><h1>OutputOnline.java</h1><pre class="source lang-java linenums">package major_project.Model.HTTP.Output;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+
+import com.google.gson.Gson;
+
+
+<span class="nc" id="L13">public class OutputOnline implements OutputProtocol{</span>
+    
+
+
+
+    
+    /** 
+     * @param paste
+     * @return String
+     */
+    public String createPaste(String paste){
+
+<span class="nc" id="L25">        String responseString = &quot;&quot;;</span>
+        try {
+
+<span class="nc" id="L28">            Gson gson = new Gson();</span>
+<span class="nc" id="L29">            String pasteJSON = gson.toJson(paste);</span>
+<span class="nc" id="L30">            System.out.println(pasteJSON);</span>
+
+<span class="nc" id="L32">            String s = &quot;api_dev_key=aDkACNGOqD1TsrHU_b2ga0yTJvqhzxpJ&amp;api_paste_code=&quot; + paste + &quot;&amp;api_option=paste&quot;;</span>
+
+<span class="nc" id="L34">            HttpRequest request = HttpRequest</span>
+<span class="nc" id="L35">                    .newBuilder(new URI(&quot;https://pastebin.com/api/api_post.php&quot;))</span>
+<span class="nc" id="L36">                    .headers(&quot;Content-Type&quot;, &quot;application/x-www-form-urlencoded&quot;)</span>
+<span class="nc" id="L37">                    .POST(HttpRequest.BodyPublishers.ofString(s))</span>
+<span class="nc" id="L38">                    .build();</span>
+<span class="nc" id="L39">            HttpClient client = HttpClient.newBuilder().build();</span>
+<span class="nc" id="L40">            HttpResponse&lt;String&gt; response = client.send(request, HttpResponse.BodyHandlers.ofString());</span>
+<span class="nc" id="L41">            System.out.println(&quot;Response status code was: &quot; + response.statusCode());</span>
+<span class="nc" id="L42">            System.out.println(&quot;Response body was:\n&quot; + response.body());</span>
+
+<span class="nc" id="L44">            responseString = response.body();</span>
+
+            
+
+<span class="nc" id="L48">        } catch (IOException | InterruptedException e) {</span>
+<span class="nc" id="L49">            System.out.println(&quot;Something went wrong with our request!&quot;);</span>
+<span class="nc" id="L50">            System.out.println(e.getMessage());</span>
+<span class="nc" id="L51">        } catch (URISyntaxException ignored) {</span>
+            // This would mean our URI is incorrect - this is here because often the URI you
+            // use will not be (fully)
+            // hard-coded and so needs a way to be checked for correctness at runtime.
+<span class="nc" id="L55">        }</span>
+
+<span class="nc" id="L57">        return responseString;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

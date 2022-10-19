@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Main.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">major_project</a> &gt; <a href="index.source.html" class="el_package">major_project</a> &gt; <span class="el_source">Main.java</span></div><h1>Main.java</h1><pre class="source lang-java linenums">package major_project;
+
+import javafx.animation.PauseTransition;
+import javafx.application.Application;
+import javafx.application.HostServices;
+import javafx.stage.Stage;
+import javafx.util.Duration;
+import major_project.Model.Engine;
+import major_project.Model.HTTP.Input.InputOffline;
+import major_project.Model.HTTP.Input.InputOnline;
+import major_project.Model.HTTP.Input.InputProtocol;
+import major_project.Model.HTTP.Output.OutputOffline;
+import major_project.Model.HTTP.Output.OutputOnline;
+import major_project.Model.HTTP.Output.OutputProtocol;
+import major_project.Model.HTTP.Output.Reddit.RedditOutput;
+import major_project.Model.SQL.MainSQL;
+import major_project.Presenter.Presenter;
+import major_project.View.GameWindow;
+import major_project.View.SplashWindow;
+
+<span class="nc" id="L21">public class Main extends Application {</span>
+
+    
+    /** 
+     * @param primaryStage
+     */
+    @Override
+    public void start(Stage primaryStage) {
+
+<span class="nc" id="L30">        InputProtocol input = new InputOnline();</span>
+<span class="nc" id="L31">        OutputProtocol output = new OutputOnline();</span>
+<span class="nc" id="L32">        HostServices hs = getHostServices();</span>
+
+<span class="nc" id="L34">        MainSQL.createDB();</span>
+<span class="nc" id="L35">        MainSQL.setupDB();</span>
+
+<span class="nc" id="L37">        System.out.println(this.getParameters().getRaw());</span>
+<span class="nc" id="L38">        System.out.println(this.getParameters().getRaw().size());</span>
+
+<span class="nc bnc" id="L40" title="All 2 branches missed.">        if (this.getParameters().getRaw().get(0).equals(&quot;offline&quot;)) {</span>
+<span class="nc" id="L41">            input = new InputOffline();</span>
+<span class="nc bnc" id="L42" title="All 2 branches missed.">            if (this.getParameters().getRaw().get(1).equals(&quot;offline&quot;)) {</span>
+<span class="nc" id="L43">                output = new OutputOffline();</span>
+            } else {
+<span class="nc" id="L45">                output = new OutputOnline();</span>
+            }
+
+        }
+
+<span class="nc bnc" id="L50" title="All 2 branches missed.">        if (this.getParameters().getRaw().get(0).equals(&quot;online&quot;)) {</span>
+<span class="nc" id="L51">            output = new OutputOnline();</span>
+<span class="nc bnc" id="L52" title="All 2 branches missed.">            if (this.getParameters().getRaw().get(1).equals(&quot;offline&quot;)) {</span>
+<span class="nc" id="L53">                output = new OutputOffline();</span>
+            } else {
+<span class="nc" id="L55">                output = new OutputOnline();</span>
+            }
+        }
+
+<span class="nc" id="L59">        Engine model = new Engine(input, output);</span>
+
+<span class="nc" id="L61">        SplashWindow splash = new SplashWindow();</span>
+
+<span class="nc" id="L63">        PauseTransition delay = new PauseTransition(Duration.seconds(2));</span>
+<span class="nc" id="L64">        delay.setOnFinished(event -&gt; {</span>
+<span class="nc" id="L65">            splash.closeSplash();</span>
+<span class="nc" id="L66">            GameWindow view = new GameWindow(model, hs);</span>
+<span class="nc" id="L67">            Presenter presenter = new Presenter(model, view);</span>
+<span class="nc" id="L68">            view.addPresenter(presenter);</span>
+<span class="nc" id="L69">            primaryStage.setScene(view.getScene());</span>
+<span class="nc" id="L70">            primaryStage.setTitle(&quot;Guardian API&quot;);</span>
+<span class="nc" id="L71">            primaryStage.show();</span>
+
+<span class="nc" id="L73">            System.out.println(&quot;End of splash&quot;);</span>
+<span class="nc" id="L74">        });</span>
+<span class="nc" id="L75">        delay.play();</span>
+
+<span class="nc" id="L77">    }</span>
+
+    
+    /** 
+     * @param args
+     */
+    public static void main(String[] args) {
+<span class="nc" id="L84">        launch(args);</span>
+<span class="nc" id="L85">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

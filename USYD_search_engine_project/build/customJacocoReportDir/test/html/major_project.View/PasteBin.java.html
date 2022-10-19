@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PasteBin.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">major_project</a> &gt; <a href="index.source.html" class="el_package">major_project.View</a> &gt; <span class="el_source">PasteBin.java</span></div><h1>PasteBin.java</h1><pre class="source lang-java linenums">package major_project.View;
+
+import javafx.event.Event;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+import major_project.Presenter.Presenter;
+
+public class PasteBin {
+<span class="nc" id="L14">    BorderPane root = new BorderPane();</span>
+<span class="nc" id="L15">    boolean finished = false;</span>
+<span class="nc" id="L16">    Stage stage = new Stage();</span>
+    String linkLong;
+    String linkShort;
+    Presenter presenter;
+
+<span class="nc" id="L21">    public PasteBin(Presenter presenter) {</span>
+
+<span class="nc" id="L23">        this.presenter = presenter;</span>
+<span class="nc" id="L24">        buildSplash();</span>
+<span class="nc" id="L25">    }</span>
+
+    public void buildSplash() {
+
+<span class="nc" id="L29">        VBox shelf = new VBox();</span>
+
+
+<span class="nc" id="L32">        Button shortPasteBtn = new Button(&quot;Create short pastebin link&quot;);</span>
+<span class="nc" id="L33">        Button longPasteBtn = new Button(&quot;Create long pastebin link&quot;);</span>
+<span class="nc" id="L34">        Label shortTitle = new Label(&quot;Pastebin short link:&quot;);</span>
+<span class="nc" id="L35">        TextField shortLink = new TextField();</span>
+
+<span class="nc" id="L37">        Label longTitle = new Label(&quot;Pastebin long link:&quot;);</span>
+<span class="nc" id="L38">        TextField longLink = new TextField(linkLong);</span>
+<span class="nc" id="L39">        Button postBtn = new Button(&quot;Post to Reddit&quot;);</span>
+<span class="nc" id="L40">        TextField redditLink = new TextField();</span>
+<span class="nc" id="L41">        postBtn.setOnAction((event) -&gt; {</span>
+<span class="nc" id="L42">            presenter.makePost();</span>
+<span class="nc" id="L43">            postBtn.setDisable(true);</span>
+<span class="nc" id="L44">            redditLink.setText(&quot;https://www.reddit.com/user/muscleman1997/posts/&quot;);</span>
+
+<span class="nc" id="L46">        });</span>
+        
+
+<span class="nc" id="L49">        shortPasteBtn.setOnAction((event) -&gt; {</span>
+<span class="nc" id="L50">            shortLink.setText(presenter.pasteShort());</span>
+<span class="nc" id="L51">            shortPasteBtn.setDisable(true);</span>
+<span class="nc" id="L52">        });</span>
+
+<span class="nc" id="L54">        longPasteBtn.setOnAction((event) -&gt; {</span>
+<span class="nc" id="L55">            longLink.setText(presenter.pasteLong());</span>
+<span class="nc" id="L56">            longPasteBtn.setDisable(true);</span>
+<span class="nc" id="L57">        });</span>
+        
+
+<span class="nc" id="L60">        shelf.getChildren().addAll(shortPasteBtn, shortTitle, shortLink, longPasteBtn,longTitle, longLink, postBtn,redditLink);</span>
+
+<span class="nc" id="L62">        root.setCenter(shelf);</span>
+        
+
+        
+
+<span class="nc" id="L67">        stage.setTitle(&quot;Pastebin Links&quot;);</span>
+<span class="nc" id="L68">        stage.setScene(new Scene(root, 500, 500));</span>
+<span class="nc" id="L69">        stage.show();</span>
+
+<span class="nc" id="L71">    }</span>
+
+    public void closeSplash() {
+<span class="nc" id="L74">        stage.close();</span>
+<span class="nc" id="L75">    }</span>
+
+    
+    /** 
+     * @return BorderPane
+     */
+    public BorderPane getRoot() {
+<span class="nc" id="L82">        return this.root;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Engine.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">major_project</a> &gt; <a href="index.source.html" class="el_package">major_project.Model</a> &gt; <span class="el_source">Engine.java</span></div><h1>Engine.java</h1><pre class="source lang-java linenums">package major_project.Model;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.google.gson.Gson;
+
+import major_project.Model.HTTP.Input.InputProtocol;
+import major_project.Model.HTTP.Input.content_search.Content;
+import major_project.Model.HTTP.Input.tag_search.Tag;
+import major_project.Model.HTTP.Output.OutputProtocol;
+import major_project.Model.HTTP.Output.Reddit.RedditOutput;
+import major_project.Model.SQL.MainSQL;
+
+public class Engine {
+    InputProtocol input;
+    OutputProtocol output;
+    String selectedTag;
+    String selectedContent;
+    List&lt;Content&gt; previousSearch;
+    List&lt;Tag&gt; previousTag;
+<span class="fc" id="L22">    RedditOutput reddit = new RedditOutput();</span>
+    String longOutput;
+
+<span class="fc" id="L25">    public Engine(InputProtocol input, OutputProtocol output) {</span>
+<span class="fc" id="L26">        this.input = input;</span>
+<span class="fc" id="L27">        this.output = output;</span>
+<span class="fc" id="L28">    }</span>
+
+    
+    /** 
+     * @param search
+     * @return List&lt;Tag&gt;
+     */
+    public List&lt;Tag&gt; searchTags(String search) {
+
+        // saving tag results
+<span class="fc" id="L38">        this.previousTag = input.searchTags(search);</span>
+
+<span class="fc" id="L40">        List&lt;Tag&gt; alreadyCachedTags = new ArrayList&lt;Tag&gt;();</span>
+
+<span class="fc bfc" id="L42" title="All 2 branches covered.">        for (Tag tag : this.previousTag) {</span>
+<span class="fc bfc" id="L43" title="All 2 branches covered.">            if (MainSQL.doesTagExist(tag.getId()) == false) {</span>
+<span class="fc" id="L44">                System.out.println(&quot;does not exist&quot;);</span>
+<span class="fc" id="L45">                MainSQL.addTag(tag.getId());</span>
+            } else {
+
+<span class="fc" id="L48">                alreadyCachedTags.add(tag);</span>
+            }
+<span class="fc" id="L50">        }</span>
+        // returns list of tags already in cache
+<span class="fc" id="L52">        return alreadyCachedTags;</span>
+    }
+
+    
+    /** 
+     * @param tag
+     * @param search
+     * @return List&lt;Content&gt;
+     */
+    public List&lt;Content&gt; searchContent(String tag, String search) {
+<span class="fc" id="L62">        List&lt;Content&gt; alreadyCachedContent = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L63">        this.previousSearch = input.searchContent(tag, search);</span>
+
+<span class="fc bfc" id="L65" title="All 2 branches covered.">        if (MainSQL.doesSearchExist(tag, search)) {</span>
+<span class="fc bfc" id="L66" title="All 2 branches covered.">            for(Content c: MainSQL.getSearchContent(MainSQL.getContentId(tag, search))){</span>
+<span class="fc" id="L67">                alreadyCachedContent.add(c);</span>
+<span class="fc" id="L68">            }</span>
+
+        }
+
+        else{
+<span class="fc" id="L73">            MainSQL.addSearch(tag, search);</span>
+
+
+<span class="fc bfc" id="L76" title="All 2 branches covered.">            for (Content content : this.previousSearch) {</span>
+<span class="fc" id="L77">                String setup = content.getWebTitle();</span>
+<span class="pc bpc" id="L78" title="1 of 2 branches missed.">                if (MainSQL.doesContentExist(setup) == false) {</span>
+<span class="fc" id="L79">                    System.out.println(&quot;does not exist&quot;);</span>
+
+                    // adding the content to the content table, referencing the correct search
+<span class="fc" id="L82">                    MainSQL.addContent(content.getWebTitle(), content.getWebPublicationDate(), content.getWebUrl(), MainSQL.getContentId(tag, search));</span>
+                } else {
+
+<span class="nc" id="L85">                    alreadyCachedContent.add(content);</span>
+                }
+<span class="fc" id="L87">            }</span>
+        }
+
+        
+
+<span class="fc" id="L92">        return alreadyCachedContent;</span>
+
+        /*
+         * else{
+         * 
+         * }
+         */
+    }
+
+    
+    /** 
+     * @return List&lt;Content&gt;
+     */
+    public List&lt;Content&gt; getPreviousSearch() {
+<span class="fc" id="L106">        return this.previousSearch;</span>
+    }
+
+    
+    /** 
+     * @param content
+     * @return String
+     */
+    public String getContentFromCache(String content) {
+<span class="fc" id="L115">        return MainSQL.getContent(content);</span>
+    }
+
+    
+    /** 
+     * @return List&lt;Tag&gt;
+     */
+    public List&lt;Tag&gt; getPreviousTags() {
+<span class="fc" id="L123">        return this.previousTag;</span>
+    }
+
+    
+    /** 
+     * @param tag
+     */
+    public void setSelectedTag(String tag) {
+<span class="fc" id="L131">        this.selectedTag = tag;</span>
+
+<span class="fc" id="L133">        System.out.println(&quot;Selected tag:&quot; + this.selectedTag);</span>
+<span class="fc" id="L134">    }</span>
+
+    
+    /** 
+     * @return String
+     */
+    public String getSelectedTag() {
+<span class="nc" id="L141">        return this.selectedTag;</span>
+    }
+
+    
+    /** 
+     * @param s
+     */
+    public void setSelectedContent(String s) {
+<span class="fc" id="L149">        this.selectedContent = s;</span>
+<span class="fc" id="L150">    }</span>
+
+    
+    /** 
+     * @return String
+     */
+    public String getSelectedContent() {
+<span class="nc" id="L157">        return this.selectedContent;</span>
+    }
+
+    
+    /** 
+     * @return String
+     */
+    public String pasteShort() {
+
+<span class="fc" id="L166">        return output.createPaste(this.selectedTag + &quot; &quot; + this.selectedContent);</span>
+    }
+
+    
+    /** 
+     * @return String
+     */
+    public String pasteLong() {
+<span class="fc" id="L174">        String allContent = &quot;&quot;;</span>
+<span class="fc bfc" id="L175" title="All 2 branches covered.">        for (Content content : getPreviousSearch()) {</span>
+<span class="fc" id="L176">            allContent = allContent + content.getWebTitle() + &quot; \n&quot;;</span>
+<span class="fc" id="L177">        }</span>
+<span class="fc" id="L178">        longOutput = this.selectedTag + &quot; &quot; + allContent;</span>
+<span class="fc" id="L179">        return output.createPaste(longOutput);</span>
+    }
+
+    public void deleteDB() {
+<span class="fc" id="L183">        MainSQL.deleteTable();</span>
+<span class="fc" id="L184">        MainSQL.setupDB();</span>
+<span class="fc" id="L185">    }</span>
+
+    public void makePost() {
+<span class="nc" id="L188">        reddit.makePost(reddit.getAuthKey(), longOutput);</span>
+<span class="nc" id="L189">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

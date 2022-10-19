@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>About.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">major_project</a> &gt; <a href="index.source.html" class="el_package">major_project.View</a> &gt; <span class="el_source">About.java</span></div><h1>About.java</h1><pre class="source lang-java linenums">package major_project.View;
+
+import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+
+public class About {
+<span class="nc" id="L11">    BorderPane root = new BorderPane();</span>
+<span class="nc" id="L12">    boolean finished = false;</span>
+<span class="nc" id="L13">    Stage stage = new Stage();</span>
+    String linkLong;
+    String linkShort;
+
+<span class="nc" id="L17">    public About() {</span>
+<span class="nc" id="L18">        buildSplash();</span>
+<span class="nc" id="L19">    }</span>
+
+    public void buildSplash() {
+
+<span class="nc" id="L23">        VBox vBox = new VBox();</span>
+<span class="nc" id="L24">        Label label = new Label(&quot;deez&quot;);</span>
+
+<span class="nc" id="L26">        vBox.getChildren().add(label);</span>
+
+<span class="nc" id="L28">        vBox.getChildren().add(new TextField(&quot;Guardian API  \nBy Marcus Peters&quot;));</span>
+
+<span class="nc" id="L30">        root.setCenter(vBox);</span>
+
+<span class="nc" id="L32">        stage.setTitle(&quot;About&quot;);</span>
+<span class="nc" id="L33">        stage.setScene(new Scene(root, 500, 500));</span>
+<span class="nc" id="L34">        stage.showAndWait();</span>
+
+<span class="nc" id="L36">    }</span>
+
+    public void closeSplash() {
+<span class="nc" id="L39">        stage.close();</span>
+<span class="nc" id="L40">    }</span>
+
+    
+    /** 
+     * @return BorderPane
+     */
+    public BorderPane getRoot() {
+<span class="nc" id="L47">        return this.root;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

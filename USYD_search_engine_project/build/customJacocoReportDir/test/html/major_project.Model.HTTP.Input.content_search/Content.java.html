@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Content.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">major_project</a> &gt; <a href="index.source.html" class="el_package">major_project.Model.HTTP.Input.content_search</a> &gt; <span class="el_source">Content.java</span></div><h1>Content.java</h1><pre class="source lang-java linenums">package major_project.Model.HTTP.Input.content_search;
+
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
+
+public class Content {
+
+@SerializedName(&quot;id&quot;)
+@Expose
+private String id;
+@SerializedName(&quot;sectionId&quot;)
+@Expose
+private String sectionId;
+@SerializedName(&quot;sectionName&quot;)
+@Expose
+private String sectionName;
+@SerializedName(&quot;webPublicationDate&quot;)
+@Expose
+private String webPublicationDate;
+@SerializedName(&quot;webTitle&quot;)
+@Expose
+private String webTitle;
+@SerializedName(&quot;webUrl&quot;)
+@Expose
+private String webUrl;
+@SerializedName(&quot;apiUrl&quot;)
+@Expose
+private String apiUrl;
+
+/**
+* No args constructor for use in serialization
+*
+*/
+<span class="nc" id="L35">public Content() {</span>
+<span class="nc" id="L36">}</span>
+
+/**
+*
+* @param sectionName
+* @param webPublicationDate
+* @param apiUrl
+* @param webUrl
+* @param webTitle
+* @param id
+* @param sectionId
+*/
+public Content(String id, String sectionId, String sectionName, String webPublicationDate, String webTitle, String webUrl, String apiUrl) {
+<span class="fc" id="L49">super();</span>
+<span class="fc" id="L50">this.id = id;</span>
+<span class="fc" id="L51">this.sectionId = sectionId;</span>
+<span class="fc" id="L52">this.sectionName = sectionName;</span>
+<span class="fc" id="L53">this.webPublicationDate = webPublicationDate;</span>
+<span class="fc" id="L54">this.webTitle = webTitle;</span>
+<span class="fc" id="L55">this.webUrl = webUrl;</span>
+<span class="fc" id="L56">this.apiUrl = apiUrl;</span>
+<span class="fc" id="L57">}</span>
+
+<span class="fc" id="L59">public Content(String webPublicationDate, String webTitle, String webUrl){</span>
+<span class="fc" id="L60">    this.webPublicationDate = webPublicationDate;</span>
+<span class="fc" id="L61">    this.webTitle = webTitle;</span>
+<span class="fc" id="L62">    this.webUrl = webUrl;</span>
+<span class="fc" id="L63">}</span>
+
+
+/** 
+ * @return String
+ */
+public String getId() {
+<span class="nc" id="L70">return id;</span>
+}
+
+
+/** 
+ * @param id
+ */
+public void setId(String id) {
+<span class="nc" id="L78">this.id = id;</span>
+<span class="nc" id="L79">}</span>
+
+
+/** 
+ * @return String
+ */
+public String getSectionId() {
+<span class="nc" id="L86">return sectionId;</span>
+}
+
+
+/** 
+ * @param sectionId
+ */
+public void setSectionId(String sectionId) {
+<span class="nc" id="L94">this.sectionId = sectionId;</span>
+<span class="nc" id="L95">}</span>
+
+
+/** 
+ * @return String
+ */
+public String getSectionName() {
+<span class="nc" id="L102">return sectionName;</span>
+}
+
+
+/** 
+ * @param sectionName
+ */
+public void setSectionName(String sectionName) {
+<span class="nc" id="L110">this.sectionName = sectionName;</span>
+<span class="nc" id="L111">}</span>
+
+
+/** 
+ * @return String
+ */
+public String getWebPublicationDate() {
+<span class="fc" id="L118">return webPublicationDate;</span>
+}
+
+
+/** 
+ * @param webPublicationDate
+ */
+public void setWebPublicationDate(String webPublicationDate) {
+<span class="nc" id="L126">this.webPublicationDate = webPublicationDate;</span>
+<span class="nc" id="L127">}</span>
+
+
+/** 
+ * @return String
+ */
+public String getWebTitle() {
+<span class="fc" id="L134">return webTitle;</span>
+}
+
+
+/** 
+ * @param webTitle
+ */
+public void setWebTitle(String webTitle) {
+<span class="nc" id="L142">this.webTitle = webTitle;</span>
+<span class="nc" id="L143">}</span>
+
+
+/** 
+ * @return String
+ */
+public String getWebUrl() {
+<span class="fc" id="L150">return webUrl;</span>
+}
+
+
+/** 
+ * @param webUrl
+ */
+public void setWebUrl(String webUrl) {
+<span class="nc" id="L158">this.webUrl = webUrl;</span>
+<span class="nc" id="L159">}</span>
+
+
+/** 
+ * @return String
+ */
+public String getApiUrl() {
+<span class="nc" id="L166">return apiUrl;</span>
+}
+
+
+/** 
+ * @param apiUrl
+ */
+public void setApiUrl(String apiUrl) {
+<span class="nc" id="L174">this.apiUrl = apiUrl;</span>
+<span class="nc" id="L175">}</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

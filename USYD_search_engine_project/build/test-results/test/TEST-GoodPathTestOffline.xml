@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="GoodPathTestOffline" tests="4" skipped="0" failures="0" errors="0" timestamp="2022-06-05T07:06:49" hostname="DESKTOP-0IUBAL2" time="0.465">
+  <properties/>
+  <testcase name="testTagSearch()" classname="GoodPathTestOffline" time="0.126"/>
+  <testcase name="testPasteShort()" classname="GoodPathTestOffline" time="0.096"/>
+  <testcase name="testContentSearch()" classname="GoodPathTestOffline" time="0.148"/>
+  <testcase name="testNothing()" classname="GoodPathTestOffline" time="0.09"/>
+  <system-out><![CDATA[Deleted tags table
+Created tags table
+does not exist
+Added new tag
+Deleted tags table
+Created tags table
+Selected tag:Sometimes I dream of cheese
+Deleted tags table
+Created tags table
+Added search to search history
+does not exist
+Added new content
+
+Printing content
+webTitle2020-09-08T07:35:08Zhttps://www.theguardian.com/football/2020/sep/08/arsenal-hector-bellerin-invests-in-forest-green-in-eco-friendly-push
+Deleted tags table
+Created tags table
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

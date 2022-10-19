@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Presenter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">major_project</a> &gt; <a href="index.source.html" class="el_package">major_project.Presenter</a> &gt; <span class="el_source">Presenter.java</span></div><h1>Presenter.java</h1><pre class="source lang-java linenums">package major_project.Presenter;
+
+import java.util.List;
+
+import javafx.application.HostServices;
+import major_project.Model.Engine;
+import major_project.Model.HTTP.Input.content_search.Content;
+import major_project.Model.HTTP.Input.tag_search.Tag;
+import major_project.View.GameWindow;
+
+
+public class Presenter{
+    private Engine model;
+    private GameWindow view;
+
+<span class="nc" id="L16">    public Presenter(Engine model, GameWindow view){</span>
+<span class="nc" id="L17">        this.model =model;</span>
+<span class="nc" id="L18">        this.view = view;</span>
+<span class="nc" id="L19">    }</span>
+
+    
+    /** 
+     * @param search
+     * @return List&lt;Tag&gt;
+     * @throws Exception
+     */
+    public List&lt;Tag&gt; searchTags(String search) throws Exception{
+<span class="nc bnc" id="L28" title="All 2 branches missed.">        if (search == null){</span>
+<span class="nc" id="L29">            throw new Exception(&quot;null type input&quot;);</span>
+        }
+<span class="nc" id="L31">        return model.searchTags(search);</span>
+    }
+
+    
+    /** 
+     * @param tag
+     * @param search
+     * @return List&lt;Content&gt;
+     * @throws Exception
+     */
+    public List&lt;Content&gt; searchContent(String tag, String search) throws Exception{
+<span class="nc bnc" id="L42" title="All 4 branches missed.">        if (tag == null || tag == search){</span>
+<span class="nc" id="L43">            throw new Exception(&quot;null type input&quot;);</span>
+        }
+<span class="nc" id="L45">        return model.searchContent(tag, search);</span>
+    }
+
+    
+    /** 
+     * @return List&lt;Tag&gt;
+     */
+    public List&lt;Tag&gt; getPreviousTags() {
+<span class="nc" id="L53">        return model.getPreviousTags();</span>
+    }
+
+
+
+    
+    /** 
+     * @return List&lt;Content&gt;
+     */
+    public List&lt;Content&gt; getPreviousSearch() {
+<span class="nc" id="L63">        return model.getPreviousSearch();</span>
+    }
+
+    
+    /** 
+     * @param content
+     * @return String
+     */
+    public String getContentFromCache(String content) {
+<span class="nc" id="L72">        return model.getContentFromCache(content);</span>
+    }
+
+    
+    /** 
+     * @param tag
+     */
+    public void setSelectedTag(String tag) {
+<span class="nc" id="L80">        model.setSelectedTag(tag);</span>
+<span class="nc" id="L81">    }</span>
+
+    
+    /** 
+     * @return String
+     */
+    public String getSelectedTag() {
+<span class="nc" id="L88">        return model.getSelectedTag();</span>
+    }
+
+    
+    /** 
+     * @param s
+     */
+    public void setSelectedContent(String s) {
+<span class="nc" id="L96">        model.setSelectedContent(s);</span>
+<span class="nc" id="L97">    }</span>
+
+    
+    /** 
+     * @return String
+     */
+    public String getSelectedContent() {
+<span class="nc" id="L104">        return model.getSelectedContent();</span>
+    }
+
+    
+    /** 
+     * @return String
+     */
+    public String pasteShort(){
+
+<span class="nc" id="L113">        return model.pasteShort();</span>
+    }
+
+    
+    /** 
+     * @return String
+     */
+    public String pasteLong() {
+<span class="nc" id="L121">        return model.pasteLong();</span>
+    }
+
+    public void deleteDB() {
+<span class="nc" id="L125">        model.deleteDB();</span>
+<span class="nc" id="L126">    }</span>
+
+    public void makePost(){
+<span class="nc" id="L129">        model.makePost();</span>
+<span class="nc" id="L130">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

@@ -1,0 +1,522 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GameWindow.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">major_project</a> &gt; <a href="index.source.html" class="el_package">major_project.View</a> &gt; <span class="el_source">GameWindow.java</span></div><h1>GameWindow.java</h1><pre class="source lang-java linenums">package major_project.View;
+
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import javafx.application.HostServices;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
+import javafx.event.EventHandler;
+import javafx.scene.Scene;
+
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TextField;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import major_project.Model.Engine;
+import major_project.Model.HTTP.Input.content_search.Content;
+import major_project.Model.HTTP.Input.tag_search.Tag;
+import major_project.Presenter.Presenter;
+
+//LISTS NEED TO BE MADE WITHIN THE MODEL NOT THE VIEW
+//PRESENTER WILL UPDATE THESE LISTS AND HANDLE THEM
+//oath libraries to obtain query, use general oath library
+//need to move hostservices, create it within main and pass it to the view class. (DONE)
+
+/* 
+Store and display the currently selected tag somewhere outside the original list so the user can see if and exactly what tag has been selected. This tag selection should stay selected and displayed until a new tag replaces it (right now after 1 content search the tag selection appears to be lost). (DONE)
+
+Replace the OK buttons on both the list of tags and list of content with a double click listener, so it is obvious what the buttons are supposed to do  (DONE)
+
+Ensure there is a button to click to send the pastebin report, don't send it automatically (DONE)
+
+With your caching (not part of the marked commits but reviewed in the readme commit), ensure that it follows the process that the request is made from the UI (with no mention of caching), the cache is checked first, if and only if there is a cache hit, go back and ask the user which to use, cache or API - for that specific query. (NEED TO CACHE THE RESULTS AND ASSOCIATE THEM WITH THE SEARCH PARAMETERS INCLUDING SLECTED TAG AND CONTENT SEARCH)
+ */
+
+public class GameWindow {
+
+    private Engine model;
+<span class="nc" id="L50">    private BorderPane root = new BorderPane();</span>
+<span class="nc" id="L51">    private Scene scene = new Scene(root);</span>
+<span class="nc" id="L52">    private List&lt;Tag&gt; tags = null;</span>
+<span class="nc" id="L53">    private List&lt;Content&gt; contents = null;</span>
+<span class="nc" id="L54">    private List&lt;Content&gt; cachedContent = null;</span>
+    private ListView&lt;String&gt; displayedContentList;
+    private ListView&lt;String&gt; displayedTagList;
+    private ListView&lt;String&gt; displayedCacheList;
+    private Task&lt;Integer&gt; task;
+    private ProgressIndicator progressIndicator;
+    private Presenter presenter;
+    private Label selectedTagLabel;
+
+    private Button searchTagBtn;
+    private Button searchContentBtn;
+    private HostServices hostServices;
+
+<span class="nc" id="L67">    private final ExecutorService pool = Executors.newFixedThreadPool(2, runnable -&gt; {</span>
+<span class="nc" id="L68">        Thread thread = new Thread(runnable);</span>
+<span class="nc" id="L69">        thread.setDaemon(true);</span>
+<span class="nc" id="L70">        return thread;</span>
+    });
+
+<span class="nc" id="L73">    public GameWindow(Engine model) {</span>
+<span class="nc" id="L74">        this.model = model;</span>
+<span class="nc" id="L75">        this.displayedTagList = new ListView&lt;String&gt;();</span>
+<span class="nc" id="L76">        this.displayedCacheList = new ListView&lt;String&gt;();</span>
+<span class="nc" id="L77">        buildGrid();</span>
+<span class="nc" id="L78">    }</span>
+
+<span class="nc" id="L80">    public GameWindow(Engine model, HostServices hostServices) {</span>
+<span class="nc" id="L81">        this.model = model;</span>
+<span class="nc" id="L82">        this.displayedTagList = new ListView&lt;String&gt;();</span>
+<span class="nc" id="L83">        this.displayedCacheList = new ListView&lt;String&gt;();</span>
+<span class="nc" id="L84">        this.hostServices = hostServices;</span>
+<span class="nc" id="L85">        buildGrid();</span>
+<span class="nc" id="L86">    }</span>
+
+    public void buildGrid() {
+
+<span class="nc" id="L90">        this.root.getChildren().removeAll(this.root.getChildren());</span>
+
+<span class="nc" id="L92">        buildTagSearch();</span>
+<span class="nc" id="L93">        buildContentSearch();</span>
+<span class="nc" id="L94">        buildCacheHandler();</span>
+
+<span class="nc" id="L96">        progressIndicator = new ProgressIndicator();</span>
+<span class="nc" id="L97">        progressIndicator.setVisible(false);</span>
+<span class="nc" id="L98">        root.setLeft(progressIndicator);</span>
+
+<span class="nc" id="L100">    }</span>
+
+    public void buildTagSearch() {
+<span class="nc" id="L103">        VBox tagBox = new VBox();</span>
+<span class="nc" id="L104">        HBox structure = new HBox();</span>
+
+<span class="nc" id="L106">        displayedTagList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);</span>
+<span class="nc" id="L107">        displayedTagList.setOnMouseClicked(new EventHandler&lt;MouseEvent&gt;() {</span>
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+<span class="nc bnc" id="L110" title="All 2 branches missed.">                if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {</span>
+<span class="nc bnc" id="L111" title="All 2 branches missed.">                    if (mouseEvent.getClickCount() == 2) {</span>
+<span class="nc" id="L112">                        selectTagAction(displayedTagList);</span>
+                    }
+                }
+<span class="nc" id="L115">            }</span>
+        });
+
+<span class="nc" id="L118">        TextField tagSearchBox = new TextField();</span>
+
+        // buttons
+<span class="nc" id="L121">        searchTagBtn = new Button(&quot;Search&quot;);</span>
+<span class="nc" id="L122">        searchTagBtn.setOnAction((event) -&gt; tagSearchAction(tagSearchBox.getText()));</span>
+        /*
+         * //task button
+         * Button taskButton = new Button(&quot;Execute Task&quot;);
+         * taskButton.setOnAction((event) -&gt; runTask(tagSearchBox.getText()));
+         */
+
+<span class="nc" id="L129">        Label tagLabel = new Label(&quot;Tag Search&quot;);</span>
+<span class="nc" id="L130">        MenuBar menuBar = new MenuBar();</span>
+<span class="nc" id="L131">        Menu menu = new Menu(&quot;Menus&quot;);</span>
+<span class="nc" id="L132">        MenuItem about = new MenuItem(&quot;about&quot;);</span>
+
+<span class="nc" id="L134">        menuBar.getMenus().add(menu);</span>
+<span class="nc" id="L135">        menu.getItems().add(about);</span>
+
+<span class="nc" id="L137">        about.setOnAction((event) -&gt; loadAbout());</span>
+
+<span class="nc" id="L139">        structure.getChildren().addAll(tagLabel, tagSearchBox, searchTagBtn);</span>
+<span class="nc" id="L140">        selectedTagLabel = new Label(&quot;No tag selected&quot;);</span>
+<span class="nc" id="L141">        tagBox.getChildren().addAll(structure, displayedTagList, selectedTagLabel);</span>
+<span class="nc" id="L142">        root.setTop(menuBar);</span>
+<span class="nc" id="L143">        root.setCenter(tagBox);</span>
+
+<span class="nc" id="L145">    }</span>
+
+    
+    /** 
+     * @param search
+     */
+    public void tagSearchAction(String search) {
+<span class="nc" id="L152">        System.out.println(&quot;Search: &quot; + search);</span>
+
+        // managing gui list
+        // first clearing content search
+<span class="nc" id="L156">        this.displayedContentList.getItems().removeAll(this.displayedContentList.getItems());</span>
+<span class="nc" id="L157">        this.contents = null;</span>
+        // then clearing tag search
+<span class="nc bnc" id="L159" title="All 2 branches missed.">        if (displayedTagList.getItems().size() &gt; 0) {</span>
+<span class="nc" id="L160">            displayedTagList.getItems().removeAll(displayedTagList.getItems());</span>
+        }
+<span class="nc" id="L162">        progressIndicator.setVisible(true);</span>
+
+<span class="nc" id="L164">        searchTagBtn.setDisable(true);</span>
+<span class="nc" id="L165">        searchContentBtn.setDisable(true);</span>
+<span class="nc" id="L166">        task = new Task&lt;&gt;() {</span>
+            @Override
+            protected Integer call() {
+<span class="nc" id="L169">                System.out.println(&quot;Task is runnning.&quot;);</span>
+                // search
+                try {
+<span class="nc" id="L172">                    presenter.searchTags(search);</span>
+<span class="nc" id="L173">                } catch (Exception e) {</span>
+                    // TODO Auto-generated catch block
+<span class="nc" id="L175">                    e.printStackTrace();</span>
+<span class="nc" id="L176">                }</span>
+
+                // getting all tag search search results from this search
+<span class="nc" id="L179">                tags = presenter.getPreviousTags();</span>
+
+                try {
+<span class="nc" id="L182">                    Thread.sleep(3000);</span>
+<span class="nc" id="L183">                } catch (InterruptedException e) {</span>
+                    // TODO Auto-generated catch block
+<span class="nc" id="L185">                    e.printStackTrace();</span>
+<span class="nc" id="L186">                }</span>
+<span class="nc" id="L187">                System.out.println(&quot;Task is still running! &quot;);</span>
+                // displaying tags
+<span class="nc" id="L189">                Platform.runLater(() -&gt; {</span>
+<span class="nc bnc" id="L190" title="All 2 branches missed.">                    for (Tag tag : tags) {</span>
+<span class="nc" id="L191">                        displayedTagList.getItems().add(tag.getId());</span>
+<span class="nc" id="L192">                    }</span>
+<span class="nc" id="L193">                });</span>
+
+                /*
+                 * try {
+                 * Thread.sleep(500);
+                 * } catch (InterruptedException ignored) {
+                 * if (isCancelled()) {
+                 * break;
+                 * }
+                 * }
+                 */
+<span class="nc" id="L204">                System.out.println(&quot;Task is still running! &quot;);</span>
+<span class="nc" id="L205">                searchTagBtn.setDisable(false);</span>
+<span class="nc" id="L206">                searchContentBtn.setDisable(false);</span>
+<span class="nc" id="L207">                progressIndicator.setVisible(false);</span>
+
+<span class="nc" id="L209">                return 0;</span>
+            }
+
+        };
+
+<span class="nc" id="L214">        pool.execute(task);</span>
+
+<span class="nc" id="L216">    }</span>
+
+    public void buildCacheHandler() {
+<span class="nc" id="L219">        VBox tagBox = new VBox();</span>
+<span class="nc" id="L220">        HBox structure = new HBox();</span>
+
+<span class="nc" id="L222">        displayedCacheList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);</span>
+
+<span class="nc" id="L224">        Button okBtn = new Button(&quot;ok&quot;);</span>
+<span class="nc" id="L225">        okBtn.setOnAction((event) -&gt; selectLoadFromCache());</span>
+<span class="nc" id="L226">        Button doneBtn = new Button(&quot;Done&quot;);</span>
+<span class="nc" id="L227">        doneBtn.setOnAction((event) -&gt; doneAction());</span>
+
+<span class="nc" id="L229">        Button clearBtn = new Button(&quot;Clear cache&quot;);</span>
+<span class="nc" id="L230">        clearBtn.setOnAction((event) -&gt; clearCache());</span>
+
+<span class="nc" id="L232">        Label tagLabel = new Label(&quot;Select tags you would like to load from cache.&quot;);</span>
+
+<span class="nc" id="L234">        structure.getChildren().addAll(tagLabel, okBtn, doneBtn, clearBtn);</span>
+
+<span class="nc" id="L236">        tagBox.getChildren().addAll(structure, displayedCacheList);</span>
+
+<span class="nc" id="L238">        root.setBottom(tagBox);</span>
+
+<span class="nc" id="L240">    }</span>
+
+    public void loadFromCacheSelection() {
+
+<span class="nc" id="L244">        this.displayedCacheList.getItems().removeAll(this.displayedCacheList.getItems());</span>
+
+<span class="nc bnc" id="L246" title="All 2 branches missed.">        for (Content c : this.cachedContent) {</span>
+<span class="nc" id="L247">            System.out.println(&quot;Cached item &quot;+ c);</span>
+<span class="nc" id="L248">            this.displayedCacheList.getItems().add(c.getWebTitle() + &quot;\n&quot; + c.getWebPublicationDate());</span>
+<span class="nc" id="L249">        }</span>
+
+<span class="nc" id="L251">    }</span>
+
+    public void doneAction() {
+<span class="nc bnc" id="L254" title="All 2 branches missed.">        if (displayedCacheList.getItems().size() &gt; 0) {</span>
+<span class="nc bnc" id="L255" title="All 2 branches missed.">            for (Content c : this.cachedContent) {</span>
+<span class="nc" id="L256">                if (this.displayedContentList.getItems()</span>
+<span class="nc bnc" id="L257" title="All 2 branches missed.">                        .contains(c.getWebTitle() + &quot;\n&quot; + c.getWebPublicationDate()) == false) {</span>
+<span class="nc" id="L258">                    this.displayedContentList.getItems().add(c.getWebTitle() + &quot;\n&quot; + c.getWebPublicationDate());</span>
+                }
+<span class="nc" id="L260">            }</span>
+
+<span class="nc" id="L262">            this.displayedCacheList.getItems().removeAll(this.displayedCacheList.getItems());</span>
+        }
+<span class="nc" id="L264">    }</span>
+
+    public void selectLoadFromCache() {
+        try {
+<span class="nc" id="L268">            String selected = this.displayedCacheList.getSelectionModel().getSelectedItem();</span>
+
+<span class="nc bnc" id="L270" title="All 2 branches missed.">            if (selected.equals(&quot;&quot;)) {</span>
+<span class="nc" id="L271">                return;</span>
+            }
+
+<span class="nc" id="L274">            this.displayedContentList.getItems().add(presenter.getContentFromCache(selected));</span>
+<span class="nc" id="L275">            this.displayedCacheList.getItems().remove(selected);</span>
+
+<span class="nc" id="L277">        } catch (Exception e) {</span>
+<span class="nc" id="L278">            System.out.println(&quot;Error: no tag selected&quot;);</span>
+<span class="nc" id="L279">        }</span>
+<span class="nc" id="L280">    }</span>
+
+    public void clearCache() {
+<span class="nc" id="L283">        this.displayedCacheList.getItems().removeAll(this.displayedCacheList.getItems());</span>
+<span class="nc" id="L284">        presenter.deleteDB();</span>
+<span class="nc" id="L285">    }</span>
+
+    
+    /** 
+     * @param displayedTagList
+     */
+    public void selectTagAction(ListView&lt;String&gt; displayedTagList) {
+        try {
+<span class="nc" id="L293">            String selected = displayedTagList.getSelectionModel().getSelectedItem();</span>
+
+<span class="nc bnc" id="L295" title="All 2 branches missed.">            if (selected.equals(&quot;&quot;)) {</span>
+<span class="nc" id="L296">                return;</span>
+            }
+
+<span class="nc" id="L299">            presenter.setSelectedTag(selected);</span>
+<span class="nc" id="L300">            selectedTagLabel.setText(&quot;Selected tag: &quot; + presenter.getSelectedTag());</span>
+<span class="nc" id="L301">        } catch (Exception e) {</span>
+<span class="nc" id="L302">            System.out.println(&quot;Error: no tag selected&quot;);</span>
+<span class="nc" id="L303">        }</span>
+
+<span class="nc" id="L305">    }</span>
+
+    public void buildContentSearch() {
+<span class="nc" id="L308">        VBox contentBox = new VBox();</span>
+<span class="nc" id="L309">        HBox structure = new HBox();</span>
+
+<span class="nc" id="L311">        this.displayedContentList = new ListView&lt;&gt;();</span>
+<span class="nc" id="L312">        this.displayedContentList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);</span>
+
+<span class="nc" id="L314">        this.displayedContentList.setMinWidth(500);</span>
+
+<span class="nc" id="L316">        this.displayedContentList.autosize();</span>
+<span class="nc" id="L317">        displayedContentList.setOnMouseClicked(new EventHandler&lt;MouseEvent&gt;() {</span>
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+<span class="nc bnc" id="L320" title="All 2 branches missed.">                if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {</span>
+<span class="nc bnc" id="L321" title="All 2 branches missed.">                    if (mouseEvent.getClickCount() == 2) {</span>
+<span class="nc" id="L322">                        selectContentAction();</span>
+                    }
+                }
+<span class="nc" id="L325">            }</span>
+        });
+
+<span class="nc" id="L328">        TextField contentSearchBox = new TextField();</span>
+
+<span class="nc" id="L330">        searchContentBtn = new Button(&quot;Search&quot;);</span>
+<span class="nc" id="L331">        searchContentBtn.setOnAction((event) -&gt; contentSearchAction(contentSearchBox.getText()));</span>
+
+<span class="nc" id="L333">        Label contentLabel = new Label(&quot;Content Search&quot;);</span>
+
+<span class="nc" id="L335">        structure.getChildren().addAll(contentLabel, contentSearchBox, searchContentBtn);</span>
+
+<span class="nc" id="L337">        contentBox.getChildren().addAll(structure, displayedContentList);</span>
+
+<span class="nc" id="L339">        root.setRight(contentBox);</span>
+<span class="nc" id="L340">    }</span>
+
+    
+    /** 
+     * @param search
+     */
+    // need to make cache list update properly, right now doesnt see content as
+    // matching because of differeing constructors.
+    private void contentSearchAction(String search) {
+
+<span class="nc" id="L350">        searchContentBtn.setDisable(true);</span>
+<span class="nc" id="L351">        searchTagBtn.setDisable(true);</span>
+        // clear display list on new search
+<span class="nc bnc" id="L353" title="All 2 branches missed.">        if (displayedContentList.getItems().size() &gt; 0) {</span>
+<span class="nc" id="L354">            displayedContentList.getItems().removeAll(displayedContentList.getItems());</span>
+        }
+<span class="nc" id="L356">        progressIndicator.setVisible(true);</span>
+
+<span class="nc" id="L358">        task = new Task&lt;&gt;() {</span>
+            @Override
+            protected Integer call() {
+<span class="nc" id="L361">                System.out.println(&quot;Task is runnning.&quot;);</span>
+                // search
+                try {
+<span class="nc" id="L364">                    presenter.searchTags(search);</span>
+<span class="nc" id="L365">                } catch (Exception e) {</span>
+                    // TODO Auto-generated catch block
+<span class="nc" id="L367">                    e.printStackTrace();</span>
+<span class="nc" id="L368">                }</span>
+
+                // getting all tag search search results from this search
+                try {
+<span class="nc" id="L372">                    cachedContent = presenter.searchContent(presenter.getSelectedTag(), search);</span>
+<span class="nc" id="L373">                    System.out.println(&quot;Saving cached content to display&quot;);</span>
+<span class="nc bnc" id="L374" title="All 2 branches missed.">                    for(Content c : cachedContent){</span>
+<span class="nc" id="L375">                        System.out.println(&quot;cached content &quot; + c.getWebTitle());</span>
+<span class="nc" id="L376">                    }</span>
+<span class="nc" id="L377">                } catch (Exception e) {</span>
+                    // TODO Auto-generated catch block
+<span class="nc" id="L379">                    e.printStackTrace();</span>
+<span class="nc" id="L380">                }</span>
+<span class="nc" id="L381">                contents = presenter.getPreviousSearch();</span>
+
+<span class="nc" id="L383">                tags = presenter.getPreviousTags();</span>
+
+                try {
+<span class="nc" id="L386">                    Thread.sleep(3000);</span>
+<span class="nc" id="L387">                } catch (InterruptedException e) {</span>
+                    // TODO Auto-generated catch block
+<span class="nc" id="L389">                    e.printStackTrace();</span>
+<span class="nc" id="L390">                }</span>
+
+                // displaying search results
+<span class="nc" id="L393">                Platform.runLater(() -&gt; {</span>
+<span class="nc bnc" id="L394" title="All 2 branches missed.">                    for (Content content : contents){</span>
+<span class="nc" id="L395">                        boolean contains = false;</span>
+<span class="nc bnc" id="L396" title="All 2 branches missed.">                        for(Content contentCached : cachedContent){</span>
+<span class="nc bnc" id="L397" title="All 2 branches missed.">                            if (contentCached.getWebUrl().equals(content.getWebUrl())){</span>
+<span class="nc" id="L398">                                contains = true;</span>
+                            }
+<span class="nc" id="L400">                        }</span>
+<span class="nc bnc" id="L401" title="All 2 branches missed.">                        if(!contains){</span>
+<span class="nc" id="L402">                            displayedContentList.getItems()</span>
+<span class="nc" id="L403">                                    .add(content.getWebTitle() + &quot;\n&quot; + content.getWebPublicationDate());</span>
+                        }
+<span class="nc" id="L405">                        loadFromCacheSelection();</span>
+<span class="nc" id="L406">                    }</span>
+
+
+
+
+                    /* for (Content content : contents) {
+                        if (cachedContent.contains(content) == false) {
+                            System.out.println(&quot;content not cached&quot;);
+                            displayedContentList.getItems()
+                                    .add(content.getWebTitle() + &quot;\n&quot; + content.getWebPublicationDate());
+                        }
+                        loadFromCacheSelection();
+                    } */
+<span class="nc" id="L419">                });</span>
+
+<span class="nc" id="L421">                System.out.println(&quot;Task is still running! &quot;);</span>
+<span class="nc" id="L422">                searchContentBtn.setDisable(false);</span>
+<span class="nc" id="L423">                searchTagBtn.setDisable(false);</span>
+<span class="nc" id="L424">                progressIndicator.setVisible(false);</span>
+
+<span class="nc" id="L426">                return 0;</span>
+            }
+
+        };
+
+<span class="nc" id="L431">        pool.execute(task);</span>
+
+<span class="nc" id="L433">    }</span>
+
+    public void selectContentAction() {
+        try {
+<span class="nc" id="L437">            String selected = displayedContentList.getSelectionModel().getSelectedItem();</span>
+<span class="nc" id="L438">            String[] ls = selected.split(&quot;\n&quot;);</span>
+<span class="nc" id="L439">            String selectedTitle = ls[0];</span>
+
+<span class="nc" id="L441">            presenter.setSelectedContent(selectedTitle);</span>
+
+<span class="nc bnc" id="L443" title="All 2 branches missed.">            if (selected.equals(&quot;&quot;)) {</span>
+<span class="nc" id="L444">                return;</span>
+            }
+
+<span class="nc bnc" id="L447" title="All 2 branches missed.">            for (Content content : presenter.getPreviousSearch()) {</span>
+<span class="nc bnc" id="L448" title="All 2 branches missed.">                if (content.getWebTitle().equals(selectedTitle)) {</span>
+<span class="nc" id="L449">                    String url = content.getWebUrl();</span>
+<span class="nc" id="L450">                    System.out.println(&quot;Api URL: &quot; + content.getApiUrl());</span>
+<span class="nc" id="L451">                    showWebsite(url);</span>
+                }
+<span class="nc" id="L453">            }</span>
+
+<span class="nc" id="L455">            displayLinks();</span>
+
+<span class="nc" id="L457">        } catch (Exception e) {</span>
+<span class="nc" id="L458">            System.out.println(&quot;Error: no content selected&quot;);</span>
+<span class="nc" id="L459">        }</span>
+<span class="nc" id="L460">    }</span>
+
+    public void displayLinks() {
+<span class="nc" id="L463">        PasteBin links = new PasteBin(presenter);</span>
+<span class="nc" id="L464">    }</span>
+
+    public void loadAbout() {
+<span class="nc" id="L467">        About about = new About();</span>
+
+<span class="nc" id="L469">    }</span>
+
+    
+    /** 
+     * @return Scene
+     */
+    public Scene getScene() {
+<span class="nc" id="L476">        return this.scene;</span>
+    }
+
+    
+    /** 
+     * @return ListView&lt;String&gt;
+     */
+    public ListView&lt;String&gt; getTagList() {
+<span class="nc" id="L484">        return this.displayedTagList;</span>
+    }
+
+    
+    /** 
+     * @param p
+     */
+    public void addPresenter(Presenter p) {
+<span class="nc" id="L492">        this.presenter = p;</span>
+<span class="nc" id="L493">    }</span>
+
+    
+    /** 
+     * @return HostServices
+     */
+    public HostServices getHostServices() {
+<span class="nc" id="L500">        return this.hostServices;</span>
+    }
+
+    
+    /** 
+     * @param uri
+     */
+    public void showWebsite(String uri) {
+<span class="nc" id="L508">        System.out.println(&quot;Showing website &quot; + uri);</span>
+<span class="nc" id="L509">        getHostServices().showDocument(uri);</span>
+<span class="nc" id="L510">    }</span>
+
+    
+    /** 
+     * @return String
+     */
+    public String getURI() {
+<span class="nc" id="L517">        System.out.println(getHostServices().getDocumentBase());</span>
+<span class="nc" id="L518">        return getHostServices().getDocumentBase();</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

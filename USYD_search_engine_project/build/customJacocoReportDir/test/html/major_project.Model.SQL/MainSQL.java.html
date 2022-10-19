@@ -1,0 +1,403 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MainSQL.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">major_project</a> &gt; <a href="index.source.html" class="el_package">major_project.Model.SQL</a> &gt; <span class="el_source">MainSQL.java</span></div><h1>MainSQL.java</h1><pre class="source lang-java linenums">package major_project.Model.SQL;
+
+import java.io.File;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.google.gson.Gson;
+
+import major_project.Model.HTTP.Input.content_search.Content;
+
+<span class="nc" id="L12">public class MainSQL {</span>
+    private static final String dbName = &quot;main.db&quot;;
+    private static final String dbURL = &quot;jdbc:sqlite:&quot; + dbName;
+
+    
+    /** 
+     * @param args
+     */
+    public static void main(String[] args) {
+<span class="nc" id="L21">        createDB();</span>
+<span class="nc" id="L22">        setupDB();</span>
+<span class="nc" id="L23">    }</span>
+
+    public static void createDB() {
+<span class="nc" id="L26">        File dbFile = new File(dbName);</span>
+<span class="nc bnc" id="L27" title="All 2 branches missed.">        if (dbFile.exists()) {</span>
+<span class="nc" id="L28">            System.out.println(&quot;Database already created&quot;);</span>
+<span class="nc" id="L29">            return;</span>
+        }
+<span class="nc" id="L31">        try (Connection ignored = DriverManager.getConnection(dbURL)) {</span>
+            // If we get here that means no exception raised from getConnection - meaning it
+            // worked
+<span class="nc" id="L34">            System.out.println(&quot;A new database has been created.&quot;);</span>
+<span class="nc" id="L35">        } catch (SQLException e) {</span>
+<span class="nc" id="L36">            System.out.println(e.getMessage());</span>
+<span class="nc" id="L37">            System.exit(-1);</span>
+<span class="nc" id="L38">        }</span>
+<span class="nc" id="L39">    }</span>
+
+    public static void removeDB() {
+<span class="nc" id="L42">        File dbFile = new File(dbName);</span>
+<span class="nc bnc" id="L43" title="All 2 branches missed.">        if (dbFile.exists()) {</span>
+<span class="nc" id="L44">            boolean result = dbFile.delete();</span>
+<span class="nc bnc" id="L45" title="All 2 branches missed.">            if (!result) {</span>
+<span class="nc" id="L46">                System.out.println(&quot;Couldn't delete existing db file&quot;);</span>
+<span class="nc" id="L47">                System.exit(-1);</span>
+            } else {
+<span class="nc" id="L49">                System.out.println(&quot;Removed existing DB file.&quot;);</span>
+            }
+<span class="nc" id="L51">        } else {</span>
+<span class="nc" id="L52">            System.out.println(&quot;No existing DB file.&quot;);</span>
+        }
+<span class="nc" id="L54">    }</span>
+
+    public static void deleteTable(){
+<span class="fc" id="L57">        String deleteCacheTable = &quot;&quot;&quot;</span>
+                DROP TABLE IF EXISTS tags
+                    &quot;&quot;&quot;;
+
+<span class="fc" id="L61">        String deleteContentCacheTable = &quot;&quot;&quot;</span>
+                DROP TABLE IF EXISTS content
+                &quot;&quot;&quot;;
+        
+<span class="fc" id="L65">        String deleteSearchCacheTable = &quot;&quot;&quot;</span>
+                DROP TABLE IF EXISTS search
+                &quot;&quot;&quot;;
+
+<span class="fc" id="L69">        try (Connection conn = DriverManager.getConnection(dbURL);</span>
+<span class="fc" id="L70">            Statement statement = conn.createStatement()) {</span>
+<span class="fc" id="L71">            statement.execute(deleteCacheTable);</span>
+<span class="fc" id="L72">            statement.execute(deleteContentCacheTable);</span>
+<span class="fc" id="L73">            statement.execute(deleteSearchCacheTable);</span>
+
+
+<span class="fc" id="L76">            System.out.println(&quot;Deleted tags table&quot;);</span>
+<span class="nc" id="L77">        } catch (SQLException e) {</span>
+<span class="nc" id="L78">            System.out.println(&quot;setup broken&quot;);</span>
+
+<span class="nc" id="L80">            System.out.println(e.getMessage());</span>
+<span class="nc" id="L81">            System.exit(-1);</span>
+<span class="fc" id="L82">        }</span>
+<span class="fc" id="L83">    }</span>
+
+
+    public static void setupDB() {
+<span class="fc" id="L87">        String createCacheTable = &quot;&quot;&quot;</span>
+                CREATE TABLE IF NOT EXISTS tags(
+                    id INTEGER PRIMARY KEY,
+                    tag TEXT NOT NULL
+                );
+                    &quot;&quot;&quot;;
+
+<span class="fc" id="L94">        String createContentCacheTable = &quot;&quot;&quot;</span>
+                CREATE TABLE IF NOT EXISTS content(
+                    id INTEGER PRIMARY KEY,
+                    content TEXT NOT NULL,
+                    date TEXT NOT NULL,
+                    address TEXT NOT NULL,
+                    search_id INTEGER,
+                    FOREIGN KEY (search_id) REFERENCES seach(id) ON DELETE CASCADE
+                );
+                &quot;&quot;&quot;;
+
+<span class="fc" id="L105">        String createSearchHistoryTable = &quot;&quot;&quot;</span>
+                CREATE TABLE IF NOT EXISTS search(
+                    id INTEGER PRIMARY KEY,
+                    tag TEXT NOT NULL,
+                    search TEXT NOT NULL
+                );
+                &quot;&quot;&quot;;
+
+<span class="fc" id="L113">        try (Connection conn = DriverManager.getConnection(dbURL);</span>
+<span class="fc" id="L114">            Statement statement = conn.createStatement()) {</span>
+<span class="fc" id="L115">            statement.execute(createCacheTable);</span>
+<span class="fc" id="L116">            statement.execute(createContentCacheTable);</span>
+<span class="fc" id="L117">            statement.execute(createSearchHistoryTable);</span>
+
+<span class="fc" id="L119">            System.out.println(&quot;Created tags table&quot;);</span>
+<span class="nc" id="L120">        } catch (SQLException e) {</span>
+<span class="nc" id="L121">            System.out.println(&quot;setup broken&quot;);</span>
+
+<span class="nc" id="L123">            System.out.println(e.getMessage());</span>
+<span class="nc" id="L124">            System.exit(-1);</span>
+<span class="fc" id="L125">        }</span>
+<span class="fc" id="L126">    }</span>
+
+    
+    /** 
+     * @param tag
+     * @return boolean
+     */
+    public static boolean doesTagExist(String tag) {
+<span class="fc" id="L134">        String findTag = &quot;&quot;&quot;</span>
+                SELECT tag FROM tags WHERE tag = ?
+                    &quot;&quot;&quot;;
+<span class="fc" id="L137">        try (Connection conn = DriverManager.getConnection(dbURL);</span>
+<span class="fc" id="L138">            PreparedStatement preparedStatement = conn.prepareStatement(findTag)) {</span>
+<span class="fc" id="L139">            preparedStatement.setString(1, tag);</span>
+
+<span class="fc" id="L141">            ResultSet result = preparedStatement.executeQuery();</span>
+    
+<span class="pc bpc" id="L143" title="1 of 2 branches missed.">            if (result.isClosed()) {</span>
+<span class="fc" id="L144">                return false;</span>
+            } else {
+<span class="nc" id="L146">                return true;</span>
+            }
+
+<span class="pc bpc" id="L149" title="2 of 4 branches missed.">        } catch (SQLException e) {</span>
+<span class="nc" id="L150">            System.out.println(&quot;tagExists broken&quot;);</span>
+<span class="nc" id="L151">            System.out.println(e.getMessage());</span>
+<span class="nc" id="L152">            System.exit(-1);</span>
+        }
+<span class="nc" id="L154">        return false;</span>
+    }
+
+    
+    /** 
+     * @param tag
+     */
+    public static void addTag(String tag) {
+<span class="fc" id="L162">        String addTag = &quot;&quot;&quot;</span>
+                INSERT INTO tags(tag) VALUES
+                    (?)
+                    &quot;&quot;&quot;;
+<span class="fc" id="L166">        try (Connection conn = DriverManager.getConnection(dbURL);</span>
+<span class="fc" id="L167">                PreparedStatement preparedStatement = conn.prepareStatement(addTag)) {</span>
+<span class="fc" id="L168">            preparedStatement.setString(1, tag);</span>
+<span class="fc" id="L169">            preparedStatement.executeUpdate();</span>
+
+<span class="fc" id="L171">            System.out.println(&quot;Added new tag&quot;);</span>
+<span class="nc" id="L172">        } catch (SQLException e) {</span>
+<span class="nc" id="L173">            System.out.println(&quot;addTag broken&quot;);</span>
+
+<span class="nc" id="L175">            System.out.println(e.getMessage());</span>
+<span class="nc" id="L176">            System.exit(-1);</span>
+<span class="fc" id="L177">        }</span>
+<span class="fc" id="L178">    }</span>
+
+    
+    /** 
+     * @param content
+     * @return boolean
+     */
+    public static boolean doesContentExist(String content) {
+<span class="fc" id="L186">        String findContent = &quot;&quot;&quot;</span>
+                SELECT content FROM content WHERE content = ?
+                    &quot;&quot;&quot;;
+<span class="fc" id="L189">        try (Connection conn = DriverManager.getConnection(dbURL);</span>
+<span class="fc" id="L190">            PreparedStatement preparedStatement = conn.prepareStatement(findContent)) {</span>
+<span class="fc" id="L191">            preparedStatement.setString(1, content);</span>
+
+<span class="fc" id="L193">            ResultSet result = preparedStatement.executeQuery();</span>
+    
+<span class="pc bpc" id="L195" title="1 of 2 branches missed.">            if (result.isClosed()) {</span>
+<span class="fc" id="L196">                return false;</span>
+            } else {
+<span class="nc" id="L198">                return true;</span>
+            }
+
+<span class="pc bpc" id="L201" title="2 of 4 branches missed.">        } catch (SQLException e) {</span>
+<span class="nc" id="L202">            System.out.println(&quot;does content exist broken&quot;);</span>
+<span class="nc" id="L203">            System.out.println(e.getMessage());</span>
+<span class="nc" id="L204">            System.exit(-1);</span>
+        }
+<span class="nc" id="L206">        return false;</span>
+    }
+
+    
+    /** 
+     * @param content
+     * @param date
+     * @param address
+     * @param id
+     */
+    public static void addContent(String content, String date, String address, int id) {
+<span class="fc" id="L217">        String addContent = &quot;&quot;&quot;</span>
+                INSERT INTO content(content, date, address, search_id) VALUES
+                    (?, ?, ?, ?)
+                    &quot;&quot;&quot;;
+<span class="fc" id="L221">        try (Connection conn = DriverManager.getConnection(dbURL);</span>
+<span class="fc" id="L222">                PreparedStatement preparedStatement = conn.prepareStatement(addContent)) {</span>
+<span class="fc" id="L223">            preparedStatement.setString(1, content);</span>
+<span class="fc" id="L224">            preparedStatement.setString(2, date);</span>
+<span class="fc" id="L225">            preparedStatement.setString(3, address);</span>
+<span class="fc" id="L226">            preparedStatement.setInt(4, id);</span>
+<span class="fc" id="L227">            preparedStatement.executeUpdate();</span>
+
+<span class="fc" id="L229">            System.out.println(&quot;Added new content&quot;);</span>
+<span class="nc" id="L230">        } catch (SQLException e) {</span>
+<span class="nc" id="L231">            System.out.println(&quot;add content broken&quot;);</span>
+
+<span class="nc" id="L233">            System.out.println(e.getMessage());</span>
+<span class="nc" id="L234">            System.exit(-1);</span>
+<span class="fc" id="L235">        }</span>
+<span class="fc" id="L236">    }</span>
+
+    
+    /** 
+     * @param content
+     * @return String
+     */
+    public static String getContent(String content){
+<span class="nc" id="L244">        String getContent = &quot;&quot;&quot;</span>
+                SELECT content FROM content WHERE content = ?
+                    &quot;&quot;&quot;;
+
+<span class="nc" id="L248">        try (Connection conn = DriverManager.getConnection(dbURL);</span>
+<span class="nc" id="L249">                PreparedStatement preparedStatement = conn.prepareStatement(getContent)) {</span>
+<span class="nc" id="L250">            preparedStatement.setString(1, content);</span>
+<span class="nc" id="L251">            ResultSet results = preparedStatement.executeQuery();</span>
+
+
+<span class="nc bnc" id="L254" title="All 2 branches missed.">            if (results.isClosed()) {</span>
+<span class="nc" id="L255">                return null;</span>
+            } else {
+<span class="nc" id="L257">                return results.getString(&quot;content&quot;);</span>
+            }
+
+<span class="nc bnc" id="L260" title="All 4 branches missed.">        } catch (SQLException e) {</span>
+<span class="nc" id="L261">            System.out.println(e.getMessage());</span>
+<span class="nc" id="L262">            System.exit(-1);</span>
+        }
+<span class="nc" id="L264">        return null;</span>
+    }
+
+    
+    /** 
+     * @param tag
+     * @param search
+     * @return boolean
+     */
+    public static boolean doesSearchExist(String tag, String search) {
+<span class="fc" id="L274">        String findContent = &quot;&quot;&quot;</span>
+                SELECT id FROM search WHERE tag = ? AND search = ?
+                    &quot;&quot;&quot;;
+<span class="fc" id="L277">        try (Connection conn = DriverManager.getConnection(dbURL);</span>
+<span class="fc" id="L278">            PreparedStatement preparedStatement = conn.prepareStatement(findContent)) {</span>
+<span class="fc" id="L279">            preparedStatement.setString(1, tag);</span>
+<span class="fc" id="L280">            preparedStatement.setString(2, search);</span>
+
+<span class="fc" id="L282">            ResultSet result = preparedStatement.executeQuery();</span>
+    
+<span class="fc bfc" id="L284" title="All 2 branches covered.">            if (result.isClosed()) {</span>
+<span class="fc" id="L285">                return false;</span>
+            } else {
+<span class="fc" id="L287">                return true;</span>
+            }
+
+<span class="pc bpc" id="L290" title="2 of 4 branches missed.">        } catch (SQLException e) {</span>
+<span class="nc" id="L291">            System.out.println(&quot;tagExists broken&quot;);</span>
+<span class="nc" id="L292">            System.out.println(e.getMessage());</span>
+<span class="nc" id="L293">            System.exit(-1);</span>
+        }
+<span class="nc" id="L295">        return false;</span>
+    }
+
+    
+    /** 
+     * @param tag
+     * @param search
+     */
+    public static void addSearch(String tag, String search) {
+<span class="fc" id="L304">        String addContent = &quot;&quot;&quot;</span>
+                INSERT INTO search(tag, search) VALUES
+                    (?, ?)
+                    &quot;&quot;&quot;;
+<span class="fc" id="L308">        try (Connection conn = DriverManager.getConnection(dbURL);</span>
+<span class="fc" id="L309">                PreparedStatement preparedStatement = conn.prepareStatement(addContent)) {</span>
+<span class="fc" id="L310">            preparedStatement.setString(1, tag);</span>
+<span class="fc" id="L311">            preparedStatement.setString(2, search);</span>
+<span class="fc" id="L312">            preparedStatement.executeUpdate();</span>
+
+<span class="fc" id="L314">            System.out.println(&quot;Added search to search history&quot;);</span>
+<span class="nc" id="L315">        } catch (SQLException e) {</span>
+<span class="nc" id="L316">            System.out.println(&quot;addTag broken&quot;);</span>
+
+<span class="nc" id="L318">            System.out.println(e.getMessage());</span>
+<span class="nc" id="L319">            System.exit(-1);</span>
+<span class="fc" id="L320">        }</span>
+<span class="fc" id="L321">    }</span>
+
+    
+    /** 
+     * @param tag
+     * @param search
+     * @return int
+     */
+    public static int getContentId(String tag, String search) {
+<span class="fc" id="L330">        String findContent = &quot;&quot;&quot;</span>
+                SELECT id FROM search WHERE tag = ? AND search = ?
+                    &quot;&quot;&quot;;
+<span class="fc" id="L333">        try (Connection conn = DriverManager.getConnection(dbURL);</span>
+<span class="fc" id="L334">            PreparedStatement preparedStatement = conn.prepareStatement(findContent)) {</span>
+<span class="fc" id="L335">            preparedStatement.setString(1, tag);</span>
+<span class="fc" id="L336">            preparedStatement.setString(2, search);</span>
+
+<span class="fc" id="L338">            ResultSet result = preparedStatement.executeQuery();</span>
+    
+<span class="fc" id="L340">            return result.getInt(&quot;id&quot;);</span>
+
+<span class="nc" id="L342">        } catch (SQLException e) {</span>
+<span class="nc" id="L343">            System.out.println(&quot;tagExists broken&quot;);</span>
+<span class="nc" id="L344">            System.out.println(e.getMessage());</span>
+<span class="nc" id="L345">            System.exit(-1);</span>
+        }
+<span class="nc" id="L347">        return 0;</span>
+    }
+
+    
+    /** 
+     * @param id
+     * @return List&lt;Content&gt;
+     */
+    public static List&lt;Content&gt; getSearchContent(int id){
+        //need to update so that returns a list of content
+<span class="fc" id="L357">        ArrayList&lt;Content&gt; searchResults = new ArrayList&lt;&gt;();</span>
+
+<span class="fc" id="L359">        String getContent = &quot;&quot;&quot;</span>
+                SELECT content,date,address FROM content WHERE search_id = ?
+                    &quot;&quot;&quot;;
+
+<span class="fc" id="L363">        try (Connection conn = DriverManager.getConnection(dbURL);</span>
+<span class="fc" id="L364">            PreparedStatement preparedStatement = conn.prepareStatement(getContent)) {</span>
+<span class="fc" id="L365">            preparedStatement.setInt(1, id);</span>
+<span class="fc" id="L366">            ResultSet results = preparedStatement.executeQuery();</span>
+
+
+<span class="fc bfc" id="L369" title="All 2 branches covered.">            while (results.next()) {</span>
+<span class="fc" id="L370">                System.out.println();</span>
+<span class="fc" id="L371">                System.out.println(&quot;Printing content&quot;);</span>
+<span class="fc" id="L372">                System.out.println(results.getString(&quot;content&quot;) + results.getString(&quot;date&quot;) + results.getString(&quot;address&quot;));</span>
+
+<span class="fc" id="L374">                String content = results.getString(&quot;content&quot;);</span>
+<span class="fc" id="L375">                String date = results.getString(&quot;date&quot;);</span>
+<span class="fc" id="L376">                String address = results.getString(&quot;address&quot;);</span>
+<span class="fc" id="L377">                searchResults.add(new Content(date, content, address));</span>
+<span class="fc" id="L378">            }</span>
+
+
+<span class="nc" id="L381">        } catch (SQLException e) {</span>
+<span class="nc" id="L382">            System.out.println(e.getMessage());</span>
+<span class="nc" id="L383">            System.exit(-1);</span>
+<span class="fc" id="L384">        }</span>
+<span class="fc" id="L385">        return searchResults;</span>
+    }
+
+  /*  public static List&lt;Content&gt; convertStringToContentObject(List&lt;String&gt; content){
+        Gson gson = new Gson();
+
+
+    } */
+
+
+
+
+
+    
+
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

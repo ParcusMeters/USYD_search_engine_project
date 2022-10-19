@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RedditOutput.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">major_project</a> &gt; <a href="index.source.html" class="el_package">major_project.Model.HTTP.Output.Reddit</a> &gt; <span class="el_source">RedditOutput.java</span></div><h1>RedditOutput.java</h1><pre class="source lang-java linenums">package major_project.Model.HTTP.Output.Reddit;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.Charset;
+import java.util.Base64;
+import java.util.Scanner;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
+import major_project.Model.Engine;
+
+public class RedditOutput {
+
+
+<span class="fc" id="L26">    public RedditOutput(){</span>
+<span class="fc" id="L27">    }</span>
+
+    public String getAuthKey(){
+<span class="nc" id="L30">        String authString = &quot;&quot;;</span>
+
+        try {
+
+<span class="nc" id="L34">            Gson gson = new Gson();</span>
+<span class="nc" id="L35">            String json = gson.toJson(null);</span>
+  
+<span class="nc" id="L37">            String s = &quot;client_id=3uPUmXAYwkf8RUsUorvMHw&amp;response_type=code&amp;state=wadawd&amp;redirect_uri=http://www.example.com/unused/redirect/uri&amp;duration=temporary&amp;scope=submit&quot;;</span>
+            
+<span class="nc" id="L39">            String userCred = &quot;G2KPFA-DIMmAQ1XeTtOYuw:olNcGx_tqISlTxT_grlDiEQa0zMbTg&quot;;</span>
+<span class="nc" id="L40">            String cred = new String(Base64.getEncoder().encodeToString(userCred.getBytes()));</span>
+
+<span class="nc" id="L42">            HttpRequest request = HttpRequest</span>
+<span class="nc" id="L43">                    .newBuilder(new URI(&quot;https://www.reddit.com/api/v1/access_token&quot;))</span>
+<span class="nc" id="L44">                    .header(&quot;Content-Type&quot;, &quot;application/x-www-form-urlencoded&quot;)</span>
+<span class="nc" id="L45">                    .header(&quot;User-Agent&quot;, &quot;major_project/v0.1&quot;)</span>
+<span class="nc" id="L46">                    .header(&quot;Authorization&quot;, &quot;Basic &quot; + cred)</span>
+<span class="nc" id="L47">                    .POST(HttpRequest.BodyPublishers.ofString(&quot;grant_type=password&amp;username=muscleman1997&amp;password=Symerevert2001&quot;))</span>
+<span class="nc" id="L48">                    .build();</span>
+<span class="nc" id="L49">            HttpClient client = HttpClient.newBuilder().build();</span>
+<span class="nc" id="L50">            HttpResponse&lt;String&gt; response = client.send(request, HttpResponse.BodyHandlers.ofString());</span>
+<span class="nc" id="L51">            System.out.println(&quot;Response status code was: &quot; + response.statusCode());</span>
+<span class="nc" id="L52">            System.out.println(&quot;Response body was:\n&quot; + response.body());</span>
+
+           
+<span class="nc" id="L55">            JsonElement element = gson.fromJson(response.body(), JsonElement.class);</span>
+<span class="nc" id="L56">            JsonObject jsonObj = element.getAsJsonObject();</span>
+
+<span class="nc" id="L58">            String authToken = gson.fromJson(jsonObj.get(&quot;access_token&quot;), String.class);</span>
+<span class="nc" id="L59">            authString = authToken;</span>
+
+<span class="nc" id="L61">            return authString;</span>
+
+            
+
+<span class="nc" id="L65">        } catch (IOException | InterruptedException e) {</span>
+<span class="nc" id="L66">            System.out.println(&quot;Something went wrong with our request!&quot;);</span>
+<span class="nc" id="L67">            System.out.println(e.getMessage());</span>
+<span class="nc" id="L68">        } catch (URISyntaxException ignored) {</span>
+            // This would mean our URI is incorrect - this is here because often the URI you
+            // use will not be (fully)
+            // hard-coded and so needs a way to be checked for correctness at runtime.
+<span class="nc" id="L72">        }</span>
+
+<span class="nc" id="L74">        return authString;</span>
+    }
+
+    public void makePost(String token, String post){
+        try {
+
+<span class="nc" id="L80">            Gson gson = new Gson();</span>
+<span class="nc" id="L81">            String json = gson.toJson(null);</span>
+  
+<span class="nc" id="L83">            String s = &quot;client_id=3uPUmXAYwkf8RUsUorvMHw&amp;response_type=code&amp;state=wadawd&amp;redirect_uri=http://www.example.com/unused/redirect/uri&amp;duration=temporary&amp;scope=submit&quot;;</span>
+            
+<span class="nc" id="L85">            String userCred = &quot;G2KPFA-DIMmAQ1XeTtOYuw:olNcGx_tqISlTxT_grlDiEQa0zMbTg&quot;;</span>
+<span class="nc" id="L86">            String cred = new String(Base64.getEncoder().encodeToString(userCred.getBytes()));</span>
+
+<span class="nc" id="L88">            HttpRequest request = HttpRequest</span>
+<span class="nc" id="L89">                    .newBuilder(new URI(&quot;https://oauth.reddit.com/api/submit&quot;))</span>
+<span class="nc" id="L90">                    .header(&quot;Content-Type&quot;, &quot;application/x-www-form-urlencoded&quot;)</span>
+<span class="nc" id="L91">                    .header(&quot;User-Agent&quot;, &quot;major_project/v0.1&quot;)</span>
+<span class="nc" id="L92">                    .header(&quot;Authorization&quot;, &quot;Bearer &quot; + token)</span>
+<span class="nc" id="L93">                    .POST(HttpRequest.BodyPublishers.ofString(&quot;kind=self&amp;sr=u_muscleman1997&amp;title=Search Results&amp;resubmit=true&amp;send_replies=true&amp;text=&quot; + post))</span>
+<span class="nc" id="L94">                    .build();</span>
+<span class="nc" id="L95">            HttpClient client = HttpClient.newBuilder().build();</span>
+<span class="nc" id="L96">            HttpResponse&lt;String&gt; response = client.send(request, HttpResponse.BodyHandlers.ofString());</span>
+<span class="nc" id="L97">            System.out.println(&quot;Response status code was: &quot; + response.statusCode());</span>
+<span class="nc" id="L98">            System.out.println(&quot;Response body was:\n&quot; + response.body());</span>
+
+           
+<span class="nc" id="L101">            JsonElement element = gson.fromJson(response.body(), JsonElement.class);</span>
+<span class="nc" id="L102">            JsonObject jsonObj = element.getAsJsonObject();</span>
+
+<span class="nc" id="L104">            String authToken = gson.fromJson(jsonObj.get(&quot;access_token&quot;), String.class);</span>
+           
+
+            
+
+<span class="nc" id="L109">        } catch (IOException | InterruptedException e) {</span>
+<span class="nc" id="L110">            System.out.println(&quot;Something went wrong with our request!&quot;);</span>
+<span class="nc" id="L111">            System.out.println(e.getMessage());</span>
+<span class="nc" id="L112">        } catch (URISyntaxException ignored) {</span>
+            // This would mean our URI is incorrect - this is here because often the URI you
+            // use will not be (fully)
+            // hard-coded and so needs a way to be checked for correctness at runtime.
+<span class="nc" id="L116">        }</span>
+
+<span class="nc" id="L118">    }</span>
+
+
+    
+    
+    
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

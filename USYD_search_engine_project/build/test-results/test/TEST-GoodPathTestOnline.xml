@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="GoodPathTestOnline" tests="7" skipped="0" failures="0" errors="0" timestamp="2022-06-05T07:06:48" hostname="DESKTOP-0IUBAL2" time="0.687">
+  <properties/>
+  <testcase name="testTagSearch()" classname="GoodPathTestOnline" time="0.395"/>
+  <testcase name="testPaste()" classname="GoodPathTestOnline" time="0.012"/>
+  <testcase name="databaseTagTest()" classname="GoodPathTestOnline" time="0.077"/>
+  <testcase name="testPasteLong()" classname="GoodPathTestOnline" time="0.047"/>
+  <testcase name="databaseContentTest()" classname="GoodPathTestOnline" time="0.008"/>
+  <testcase name="testContentSearch()" classname="GoodPathTestOnline" time="0.134"/>
+  <testcase name="testNothing()" classname="GoodPathTestOnline" time="0.001"/>
+  <system-out><![CDATA[does not exist
+Added new tag
+Selected tag:Sometimes I dream of cheese
+does not exist
+Selected tag:Sometimes I dream of cheese
+Added search to search history
+does not exist
+Added new content
+does not exist
+Deleted tags table
+Created tags table
+Added search to search history
+does not exist
+Added new content
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
